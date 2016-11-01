@@ -1,7 +1,9 @@
 package com.example.a41824471.jueguito;
 
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import org.cocos2d.actions.interval.MoveTo;
 import org.cocos2d.actions.interval.RotateTo;
@@ -25,9 +27,11 @@ import java.util.TimerTask;
 public class clsJuego {
     CCGLSurfaceView _VistaJuego;
     CCSize PantallaDis;
-    Sprite Nave;
     Sprite ImagenFondo;
-    Sprite Enemigo;
+    Sprite linea;
+    Sprite NotaSOL;
+    Sprite NotaRe;
+    public static int tamañotouch=50;
 
     public clsJuego(CCGLSurfaceView Vistadeljuego) {
         _VistaJuego = Vistadeljuego;
@@ -58,6 +62,7 @@ public class clsJuego {
         EscenaDevolver.addChild(capafondo, -10);
         EscenaDevolver.addChild(capafrente, 10);
 
+
         return EscenaDevolver;
     }
 
@@ -67,25 +72,26 @@ public class clsJuego {
         }
 
         private void ponerImagenFondo() {
-            ImagenFondo = Sprite.sprite("fondo.png");
+            ImagenFondo = Sprite.sprite("fondojuego.gif");
             ImagenFondo.setPosition(PantallaDis.width / 2, PantallaDis.height / 2);
             ImagenFondo.runAction(ScaleBy.action(0.01f, 3.0f, 4.0f));
             super.addChild(ImagenFondo);
         }
     }
 
+
+
     class CapaDeFrente extends Layer {
         public CapaDeFrente() {
-            Log.d("CapaFrente", "Constructor");
-
-            Log.d("CapaFrente", "Jugador en pos inicial");
-            PonerNavePosicionInicial();
+            Initlinea();
+            this.setIsTouchEnabled(true);
 
             TimerTask timerenemigos;
             timerenemigos = new TimerTask() {
                 @Override
                 public void run() {
-                    PonerEnemigo();
+                    PonerNotaSOL();
+                    PonerNotaRe();
                 }
             };
 
@@ -94,115 +100,91 @@ public class clsJuego {
             RelojEnemigos.schedule(timerenemigos, 0, 1000);
         }
 
-        private void PonerNavePosicionInicial() {
-            Log.d("Poner Nave Jugador", "comienza");
+        void Initlinea (){
+            linea = Sprite.sprite("lineaneon.gif");
 
-            Nave = Sprite.sprite("rocket_mini.png");
-            float PosIX, PosIY;
-            PosIX = PantallaDis.width / 2;
-            PosIY = PantallaDis.getHeight() / 2;
-            Nave.setPosition(PosIX, PosIY);
-            super.addChild(Nave);
+
+            float posx, posy;
+            float Altolinea = linea.getHeight();
+            float Ancholinea=linea.getWidth();
+            posy = PantallaDis.height/8;
+            posx =0+Ancholinea/2;
+
+            linea.setPosition(posx,posy);
+            super.addChild(linea);
         }
 
-        void PonerEnemigo() {
-            Enemigo = Sprite.sprite("enemigo.gif");
+           void PonerNotaSOL() {
+               NotaSOL = Sprite.sprite("nota-sol.gif");
+
             CCPoint PosInicial;
             PosInicial = new CCPoint();
-            float Alturaenemigo = Enemigo.getHeight();
-            float AnchoEnemigo = Enemigo.getWidth();
+            float AlturaSol = NotaSOL.getHeight();
+               float AnchoSol=NotaSOL.getWidth();
 
-            Random r = new Random();
-            PosInicial.y = PantallaDis.height + Alturaenemigo / 2;
-            PosInicial.x = r.nextInt((int) PantallaDis.width - (int) AnchoEnemigo) + AnchoEnemigo / 2;
-            Enemigo.setPosition(PosInicial.x, PosInicial.y);
+
+               //SOL
+            PosInicial.y = PantallaDis.height + AlturaSol / 2;
+            PosInicial.x = PantallaDis.width/4;
+               NotaSOL.setPosition(PosInicial.x, PosInicial.y);
             //Enemigo.runAction(RotateTo.action(0.01f,180f));
-
             CCPoint PosFinal;
             PosFinal = new CCPoint();
             PosFinal.x = PosInicial.x;
-            PosFinal.y = -Alturaenemigo / 2;
-            Enemigo.runAction(MoveTo.action(3, PosFinal.x, PosFinal.y));
-            super.addChild(Enemigo);
+            PosFinal.y = -AlturaSol / 2;
+               NotaSOL.runAction(MoveTo.action(5, PosFinal.x, PosFinal.y));
+            super.addChild(NotaSOL);
+        }
+
+        void PonerNotaRe(){
+            NotaRe=Sprite.sprite("nota-re.png");
+
+            CCPoint PosInicial;
+            PosInicial = new CCPoint();
+            float AlturaRe=NotaRe.getHeight();
+            float AnchoRe=NotaRe.getWidth();
+
+            CCPoint PosFinal;
+            PosFinal = new CCPoint();
+            PosInicial.y=PantallaDis.height+AlturaRe/2;
+            PosInicial.x=PantallaDis.width/4+PantallaDis.width/4;
+            NotaRe.setPosition(PosInicial.x,PosInicial.y);
+
+            PosFinal.x=PosInicial.x;
+            PosFinal.y=-AlturaRe/2;
+            NotaRe.runAction((MoveTo.action(5,PosFinal.x,PosFinal.y)));
+            super.addChild(NotaRe);
 
         }
 
-        boolean EstaEntre(int NumeroaComparar, int NumeroMenor, int NumeroMayor) {
-            boolean Devolver;
 
-            if (NumeroMenor > NumeroMayor) {
-                int aux;
-                aux = NumeroMayor;
-                NumeroMayor = NumeroMenor;
-                NumeroMenor = aux;
+        public boolean ccTouchesBegan(MotionEvent event){
+            int x= (int) event.getX();
+            int y= (int) event.getY();
+            Rect touchr= new Rect(x-tamañotouch, Math.round(PantallaDis.height-y-tamañotouch), x+tamañotouch, Math.round(PantallaDis.height-y+tamañotouch));
+
+            int lineax= (int) linea.getWidth()/2;
+            int lineay= (int)  linea.getHeight()/2;
+             Rect linear= new Rect (-lineax,-lineay,lineax,lineay);
+
+            int notax= (int) NotaSOL.getWidth()/2;
+            int notay= (int)  NotaSOL.getHeight()/2;
+            int solX = (int)NotaSOL.getPositionX();
+            int solY = (int)NotaSOL.getPositionY();
+            Rect notar= new Rect (solX-notax,solY-notay,solX+notax,solY+notay);
+            Log.d("touch","en :"+touchr);
+            Log.d("nota","en :"+notar);
+
+            if(touchr.intersect(notar)){
+                Log.d("inter","inter");
             }
-            if (NumeroaComparar >= NumeroMenor && NumeroaComparar <= NumeroMayor) {
-                Devolver = true;
-            } else {
-                Devolver = false;
-            }
-            return Devolver;
+
+            return true;
         }
-
-        boolean InterseccionEntreSprites(Sprite Sprite1, Sprite Sprite2) {
-            boolean Devolver;
-            Devolver = false;
-
-            int Sprite1Izquierda, Sprite1Derecha, Sprite1Abajo, Sprite1Arriba;
-            int Sprite2Izquierda, Sprite2Derecha, Sprite2Abajo, Sprite2Arriba;
-            Sprite1Izquierda = (int) (Sprite1.getPositionX() - Sprite1.getWidth() / 2);
-            Sprite1Derecha = (int) (Sprite1.getPositionX() + Sprite1.getWidth() / 2);
-            Sprite1Abajo = (int) (Sprite1.getPositionY() - Sprite1.getHeight() / 2);
-            Sprite1Arriba = (int) (Sprite1.getPositionY() + Sprite1.getHeight() / 2);
-            Sprite2Izquierda = (int) (Sprite2.getPositionX() - Sprite2.getWidth() / 2);
-            Sprite2Derecha = (int) (Sprite2.getPositionX() + Sprite2.getWidth() / 2);
-            Sprite2Abajo = (int) (Sprite2.getPositionY() - Sprite2.getHeight() / 2);
-            Sprite2Arriba = (int) (Sprite2.getPositionY() + Sprite2.getHeight() / 2);
-
-            //Borde izq y borde inf de Sprite 1 está dentro de Sprite 2
-            if (EstaEntre(Sprite1Izquierda, Sprite2Izquierda, Sprite2Derecha) && EstaEntre(Sprite1Abajo, Sprite2Abajo, Sprite2Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde izq y borde sup de Sprite 1 está dentro de Sprite 2
-            if (EstaEntre(Sprite1Izquierda, Sprite2Izquierda, Sprite2Derecha) && EstaEntre(Sprite1Arriba, Sprite2Abajo, Sprite2Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde der y borde sup de Sprite 1 está dentro de Sprite 2
-            if (EstaEntre(Sprite1Derecha, Sprite2Izquierda, Sprite2Derecha) && EstaEntre(Sprite1Arriba, Sprite2Abajo, Sprite2Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde der y borde inf de Sprite 1 está dentro de Sprite 2
-            if (EstaEntre(Sprite1Derecha, Sprite2Izquierda, Sprite2Derecha) && EstaEntre(Sprite1Abajo, Sprite2Abajo, Sprite2Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde izq y borde inf de Sprite 2 está dentro de Sprite 1
-            if (EstaEntre(Sprite2Izquierda, Sprite1Izquierda, Sprite1Derecha) && EstaEntre(Sprite2Abajo, Sprite1Abajo, Sprite1Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde izq y borde sup de Sprite 1 está dentro de Sprite 1
-            if (EstaEntre(Sprite2Izquierda, Sprite1Izquierda, Sprite1Derecha) && EstaEntre(Sprite2Arriba, Sprite1Abajo, Sprite1Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde der y borde sup de Sprite 2 está dentro de Sprite 1
-            if (EstaEntre(Sprite2Derecha, Sprite1Izquierda, Sprite1Derecha) && EstaEntre(Sprite2Arriba, Sprite1Abajo, Sprite1Arriba)) {
-                Devolver = true;
-            }
-
-            //Borde der y borde inf de Sprite 2 está dentro de Sprite 1
-            if (EstaEntre(Sprite2Derecha, Sprite1Izquierda, Sprite1Derecha) && EstaEntre(Sprite2Abajo, Sprite1Abajo, Sprite1Arriba)) {
-                Devolver = true;
-            }
-            return Devolver;
-        }
-
-
     }
+
+
+
 
 
 
