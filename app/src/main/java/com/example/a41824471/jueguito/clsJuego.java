@@ -1,5 +1,7 @@
 package com.example.a41824471.jueguito;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -17,6 +19,8 @@ import org.cocos2d.opengl.CCGLSurfaceView;
 import org.cocos2d.types.CCPoint;
 import org.cocos2d.types.CCSize;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,6 +35,7 @@ public class clsJuego {
     Sprite linea;
     Sprite NotaSOL;
     Sprite NotaRe;
+    ArrayList<Sprite> arraynotas;
     public static int tamañotouch=50;
 
     public clsJuego(CCGLSurfaceView Vistadeljuego) {
@@ -84,20 +89,23 @@ public class clsJuego {
     class CapaDeFrente extends Layer {
         public CapaDeFrente() {
             Initlinea();
+            arraynotas= new ArrayList<>();
             this.setIsTouchEnabled(true);
+
+            //timer para detectar colisiones
 
             TimerTask timerenemigos;
             timerenemigos = new TimerTask() {
                 @Override
                 public void run() {
-                    PonerNotaSOL();
                     PonerNotaRe();
+                    PonerNotaSOL();
                 }
             };
 
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
-            RelojEnemigos.schedule(timerenemigos, 0, 1000);
+            RelojEnemigos.schedule(timerenemigos, 0, 2000);
         }
 
         void Initlinea (){
@@ -133,6 +141,7 @@ public class clsJuego {
             PosFinal.x = PosInicial.x;
             PosFinal.y = -AlturaSol / 2;
                NotaSOL.runAction(MoveTo.action(5, PosFinal.x, PosFinal.y));
+               arraynotas.add(NotaSOL);
             super.addChild(NotaSOL);
         }
 
@@ -157,28 +166,47 @@ public class clsJuego {
 
         }
 
+        public void Colisiones (){
+
+        }
+
 
         public boolean ccTouchesBegan(MotionEvent event){
             int x= (int) event.getX();
             int y= (int) event.getY();
-            Rect touchr= new Rect(x-tamañotouch, Math.round(PantallaDis.height-y-tamañotouch), x+tamañotouch, Math.round(PantallaDis.height-y+tamañotouch));
+            Rect touchr= new Rect((x-tamañotouch)*13/10, (Math.round(PantallaDis.getHeight()-y-tamañotouch)*13/10), (x+tamañotouch)*13/10, (Math.round(PantallaDis.getHeight()-y+tamañotouch))*13/10);
 
             int lineax= (int) linea.getWidth()/2;
             int lineay= (int)  linea.getHeight()/2;
-             Rect linear= new Rect (-lineax,-lineay,lineax,lineay);
+            int posxlinea= (int) linea.getPositionX();
+            int posylinea= (int) linea.getPositionY();
+             Rect linear= new Rect (posxlinea-lineax,Math.round(PantallaDis.getHeight()-posylinea-lineay),posxlinea+lineax,Math.round(PantallaDis.getHeight()-posylinea+lineay));
+            Log.d("juego", "touch" + touchr);
+            for(Sprite nota : arraynotas) {
+                int notax = (int) nota.getWidth() / 2;
+                int notay = (int) nota.getHeight() / 2;
+                int solX = (int) nota.getPositionX();
+                int solY = (int) nota.getPositionY();
+                Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
+                if(nota.getHeight()>0){
+                    arraynotas.remove(nota);
+                }
+                Log.d("juego", "nota" + notar);
 
-            int notax= (int) NotaSOL.getWidth()/2;
-            int notay= (int)  NotaSOL.getHeight()/2;
-            int solX = (int)NotaSOL.getPositionX();
-            int solY = (int)NotaSOL.getPositionY();
-            Rect notar= new Rect (solX-notax,solY-notay,solX+notax,solY+notay);
-            Log.d("touch","en :"+touchr);
-            Log.d("nota","en :"+notar);
+                if (touchr.intersect(notar)) {
+                    Log.d("juego", "interA");
+                }
+                if(notar.intersect(linear)){
+                    Log.d("juego","interB");
+                }
+                if(linear.intersect(touchr)){
+                    Log.d("juego","interC");
+                }
+                if(touchr.intersect(notar) && notar.intersect(linear)){
+                    Log.d("juego","interTOTAL");
+                }
 
-            if(touchr.intersect(notar)){
-                Log.d("inter","inter");
             }
-
             return true;
         }
     }
