@@ -120,8 +120,8 @@ public class clsJuego {
             timerenemigos = new TimerTask() {
                 @Override
                 public void run() {
-                    PonerNotaRe();
                     PonerNotaSOL();
+                    PonerNotaRe();
                 }
             };
 
