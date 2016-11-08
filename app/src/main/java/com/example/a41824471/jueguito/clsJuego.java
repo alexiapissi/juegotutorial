@@ -1,5 +1,7 @@
 package com.example.a41824471.jueguito;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -17,13 +19,13 @@ import org.cocos2d.opengl.CCGLSurfaceView;
 import org.cocos2d.types.CCPoint;
 import org.cocos2d.types.CCSize;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by 41824471 on 13/9/2016.
- */
+
 public class clsJuego {
     CCGLSurfaceView _VistaJuego;
     CCSize PantallaDis;
@@ -31,7 +33,13 @@ public class clsJuego {
     Sprite linea;
     Sprite NotaSOL;
     Sprite NotaRe;
+    ArrayList<Sprite> arraynotas;
     public static int tamañotouch=50;
+    Rect touchr;
+    boolean  tocando=false;
+    Rect linear;
+    int puntaje=0;
+    Label lblPuntaje;
 
     public clsJuego(CCGLSurfaceView Vistadeljuego) {
         _VistaJuego = Vistadeljuego;
@@ -82,22 +90,47 @@ public class clsJuego {
 
 
     class CapaDeFrente extends Layer {
+
+
         public CapaDeFrente() {
             Initlinea();
+            arraynotas= new ArrayList<>();
             this.setIsTouchEnabled(true);
+            int lineax= (int) linea.getWidth()/2;
+            int lineay= (int)  linea.getHeight();
+            int posxlinea= (int) linea.getPositionX();
+            int posylinea= (int) linea.getPositionY();
+            linear= new Rect (posxlinea-lineax,Math.round(PantallaDis.getHeight()-posylinea-lineay),posxlinea+lineax,Math.round(PantallaDis.getHeight()-posylinea+lineay));
+            Log.d("linear:","linea+"+linear);
+            lblPuntaje=Label.label(""+puntaje,"Verdana",30);
+
+            TimerTask TColisiones;
+            TColisiones=new TimerTask(){
+                @Override
+                public void run(){
+                    DetectarColisiones();
+                }
+            };
+            Timer RelojColisiones;
+            RelojColisiones=new Timer();
+            RelojColisiones.schedule(TColisiones,0,200);
+
 
             TimerTask timerenemigos;
             timerenemigos = new TimerTask() {
                 @Override
                 public void run() {
-                    PonerNotaSOL();
                     PonerNotaRe();
+                    PonerNotaSOL();
                 }
             };
 
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
-            RelojEnemigos.schedule(timerenemigos, 0, 1000);
+            RelojEnemigos.schedule(timerenemigos, 0, 2000);
+
+            PonerTitulo();
+
         }
 
         void Initlinea (){
@@ -133,6 +166,7 @@ public class clsJuego {
             PosFinal.x = PosInicial.x;
             PosFinal.y = -AlturaSol / 2;
                NotaSOL.runAction(MoveTo.action(5, PosFinal.x, PosFinal.y));
+               arraynotas.add(NotaSOL);
             super.addChild(NotaSOL);
         }
 
@@ -157,29 +191,85 @@ public class clsJuego {
 
         }
 
+        private void PonerTitulo(){
+            lblPuntaje.setString(""+puntaje);
+            float AltoTitulo;
+            AltoTitulo=lblPuntaje.getHeight();
+            lblPuntaje.setPosition(PantallaDis.width/2,PantallaDis.height-AltoTitulo/2);
+            super.addChild(lblPuntaje);
+
+        }
 
         public boolean ccTouchesBegan(MotionEvent event){
             int x= (int) event.getX();
             int y= (int) event.getY();
-            Rect touchr= new Rect(x-tamañotouch, Math.round(PantallaDis.height-y-tamañotouch), x+tamañotouch, Math.round(PantallaDis.height-y+tamañotouch));
+            touchr= new Rect (x-tamañotouch, y-tamañotouch, x+tamañotouch, y+tamañotouch);
+            Log.d("juego", "touch" + touchr);
+            tocando=true;
+            Log.d("inter touch","empeiza");
+            return true;
+        }
 
-            int lineax= (int) linea.getWidth()/2;
-            int lineay= (int)  linea.getHeight()/2;
-             Rect linear= new Rect (-lineax,-lineay,lineax,lineay);
+        public boolean ccTouchesEnded(MotionEvent event){
+            Log.d("inter","termina");
+            tocando=false;
+            return  true;
+        }
 
-            int notax= (int) NotaSOL.getWidth()/2;
-            int notay= (int)  NotaSOL.getHeight()/2;
-            int solX = (int)NotaSOL.getPositionX();
-            int solY = (int)NotaSOL.getPositionY();
-            Rect notar= new Rect (solX-notax,solY-notay,solX+notax,solY+notay);
-            Log.d("touch","en :"+touchr);
-            Log.d("nota","en :"+notar);
+        void DetectarColisiones(){
+            boolean hubocolision;
+            hubocolision=false;
 
-            if(touchr.intersect(notar)){
-                Log.d("inter","inter");
+
+            Sprite nota;
+            if(tocando==true) {
+                Log.d("inter", "touch" + touchr);
+                Log.d("inter","touch"+linear);
+                /*if (touchr.intersect(linear)) {
+                    hubocolision = true;
+                    Log.d("juego", "interaC");
+                }*/
+
+                for (int i=0; i<arraynotas.size();i++) {
+                     nota=arraynotas.get(i);
+                    int notax = (int) nota.getWidth()*2;
+                    int notay = (int) nota.getHeight()*2;
+                    int solX = (int) nota.getPositionX();
+                    int solY = (int) nota.getPositionY();
+                    Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
+                    if (nota.getHeight() > 0) {
+                     //arraynotas.remove(nota);
+                    }
+                    Log.d("inter"+i, "nota" + notar);
+                    Log.d("inter"+i, "touch" + touchr);
+                    Log.d("inter","touch"+linear);
+
+
+                    if (touchr.intersect(notar)) {
+                        Log.d("juego", "interaA");
+                        hubocolision = true;
+                    }
+                    if (notar.intersect(linear)) {
+                        Log.d("juego", "interaB");
+                        hubocolision = true;
+                    }
+
+                    if (touchr.intersect(notar) && notar.intersect(linear)) {
+                        hubocolision = true;
+                        Log.d("juego", "interaTOTAL");
+                        puntaje=puntaje+5;
+
+                        PonerTitulo();
+
+                    }else{
+                        puntaje--;
+                        PonerTitulo();
+
+                    }
+
+                }
             }
 
-            return true;
         }
     }
 
