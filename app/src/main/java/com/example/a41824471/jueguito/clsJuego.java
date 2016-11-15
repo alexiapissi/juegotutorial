@@ -1,9 +1,12 @@
 package com.example.a41824471.jueguito;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -31,18 +34,20 @@ public class clsJuego {
     CCSize PantallaDis;
     Sprite ImagenFondo;
     Sprite linea;
-    Sprite NotaSOL;
-    Sprite NotaRe;
-    ArrayList<Sprite> arraynotas;
+    Nota NotaSOL;
+    Nota NotaRe;
+    ArrayList<Nota> arraynotas;
     public static int tamañotouch=50;
     Rect touchr;
     boolean  tocando=false;
     Rect linear;
     int puntaje=0;
     Label lblPuntaje;
+    Context context;
 
-    public clsJuego(CCGLSurfaceView Vistadeljuego) {
+    public clsJuego(CCGLSurfaceView Vistadeljuego, Context context) {
         _VistaJuego = Vistadeljuego;
+        this.context = context;
     }
 
     public void Comenzarjuego() {
@@ -113,7 +118,7 @@ public class clsJuego {
             };
             Timer RelojColisiones;
             RelojColisiones=new Timer();
-            RelojColisiones.schedule(TColisiones,0,200);
+            RelojColisiones.schedule(TColisiones,0,100);
 
 
             TimerTask timerenemigos;
@@ -133,6 +138,9 @@ public class clsJuego {
 
         }
 
+        MediaPlayer mpSol;
+        MediaPlayer mpRe;
+
         void Initlinea (){
             linea = Sprite.sprite("lineaneon.gif");
 
@@ -148,46 +156,51 @@ public class clsJuego {
         }
 
            void PonerNotaSOL() {
-               NotaSOL = Sprite.sprite("nota-sol.gif");
+               //NotaSOL = Sprite.sprite("nota-sol.gif");
+               NotaSOL= new Nota("nota-sol.gif");
+               NotaSOL.setTipo("Sol");
 
             CCPoint PosInicial;
             PosInicial = new CCPoint();
-            float AlturaSol = NotaSOL.getHeight();
-               float AnchoSol=NotaSOL.getWidth();
+            float AlturaSol = NotaSOL.getSprite().getHeight();
+               float AnchoSol=NotaSOL.getSprite().getWidth();
 
 
                //SOL
             PosInicial.y = PantallaDis.height + AlturaSol / 2;
             PosInicial.x = PantallaDis.width/4;
-               NotaSOL.setPosition(PosInicial.x, PosInicial.y);
+               NotaSOL.getSprite().setPosition(PosInicial.x, PosInicial.y);
             //Enemigo.runAction(RotateTo.action(0.01f,180f));
             CCPoint PosFinal;
             PosFinal = new CCPoint();
             PosFinal.x = PosInicial.x;
             PosFinal.y = -AlturaSol / 2;
-               NotaSOL.runAction(MoveTo.action(5, PosFinal.x, PosFinal.y));
+               NotaSOL.getSprite().runAction(MoveTo.action(5, PosFinal.x, PosFinal.y));
                arraynotas.add(NotaSOL);
-            super.addChild(NotaSOL);
+            super.addChild(NotaSOL.getSprite());
         }
 
         void PonerNotaRe(){
-            NotaRe=Sprite.sprite("nota-re.png");
+            //NotaRe=Sprite.sprite("nota-re.png");
+            NotaRe= new Nota("nota-re.png");
+            NotaRe.setTipo("re");
 
             CCPoint PosInicial;
             PosInicial = new CCPoint();
-            float AlturaRe=NotaRe.getHeight();
-            float AnchoRe=NotaRe.getWidth();
+            float AlturaRe=NotaRe.getSprite().getHeight();
+            float AnchoRe=NotaRe.getSprite().getWidth();
 
             CCPoint PosFinal;
             PosFinal = new CCPoint();
             PosInicial.y=PantallaDis.height+AlturaRe/2;
             PosInicial.x=PantallaDis.width/4+PantallaDis.width/4;
-            NotaRe.setPosition(PosInicial.x,PosInicial.y);
+            NotaRe.getSprite().setPosition(PosInicial.x,PosInicial.y);
 
             PosFinal.x=PosInicial.x;
             PosFinal.y=-AlturaRe/2;
-            NotaRe.runAction((MoveTo.action(5,PosFinal.x,PosFinal.y)));
-            super.addChild(NotaRe);
+            NotaRe.getSprite().runAction((MoveTo.action(5,PosFinal.x,PosFinal.y)));
+            arraynotas.add(NotaRe);
+            super.addChild(NotaRe.getSprite());
 
         }
 
@@ -219,9 +232,7 @@ public class clsJuego {
         void DetectarColisiones(){
             boolean hubocolision;
             hubocolision=false;
-
-
-            Sprite nota;
+            Nota nota;
             if(tocando==true) {
                 Log.d("inter", "touch" + touchr);
                 Log.d("inter","touch"+linear);
@@ -232,13 +243,13 @@ public class clsJuego {
 
                 for (int i=0; i<arraynotas.size();i++) {
                      nota=arraynotas.get(i);
-                    int notax = (int) nota.getWidth()*2;
-                    int notay = (int) nota.getHeight()*2;
-                    int solX = (int) nota.getPositionX();
-                    int solY = (int) nota.getPositionY();
+                    int notax = (int) nota.getSprite().getWidth()*2;
+                    int notay = (int) nota.getSprite().getHeight()*2;
+                    int solX = (int) nota.getSprite().getPositionX();
+                    int solY = (int) nota.getSprite().getPositionY();
                     Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
-                    if (nota.getHeight() > 0) {
-                     //arraynotas.remove(nota);
+                    if (nota.getSprite().getPositionY() <= 0) {
+                        arraynotas.remove(nota);
                     }
                     Log.d("inter"+i, "nota" + notar);
                     Log.d("inter"+i, "touch" + touchr);
@@ -258,6 +269,14 @@ public class clsJuego {
                         hubocolision = true;
                         Log.d("juego", "interaTOTAL");
                         puntaje=puntaje+5;
+                        if(arraynotas.get(i).getTipo().equals("sol")){
+                            mpSol=MediaPlayer.create(context, R.raw.sol);
+                            mpSol.start();
+                        }
+                        if(arraynotas.get(i).getTipo().equals("re")){
+                            mpRe=MediaPlayer.create(context, R.raw.re);
+                            mpRe.start();
+                        }
 
                         PonerTitulo();
 

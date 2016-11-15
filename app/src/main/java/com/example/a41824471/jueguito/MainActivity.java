@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
     protected void onStart(){
         super.onStart();
         clsJuego juego;
-        juego= new clsJuego(vistap);
+        juego= new clsJuego(vistap, getBaseContext());
         juego.Comenzarjuego();
     }
 }

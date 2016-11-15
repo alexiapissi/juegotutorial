@@ -4,12 +4,21 @@ import org.cocos2d.nodes.Sprite;
 import org.cocos2d.opengl.Texture2D;
 
 
-public class Nota extends Sprite{
+public class Nota{
     int Id;
+    String tipo;
+    Sprite sprite;
 
-    public Nota(Texture2D tex, int id) {
-        super(tex);
-        Id = id;
+    public Nota( String gifFile) {
+        sprite = Sprite.sprite(gifFile);
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public int getId() {
@@ -18,5 +27,9 @@ public class Nota extends Sprite{
 
     public void setId(int id) {
         Id = id;
+    }
+
+    public Sprite getSprite() {
+        return sprite;
     }
 }
