@@ -191,18 +191,26 @@ public class clsJuego {
             timerenemigos = new TimerTask() {
                 @Override
                 public void run() {
-
+                    if(tiempo<=cancion.size()){
                         snota = cancion.get(tiempo);
                         PonerNota(snota);
                         tiempo++;
 
+                    }else{
+                        tiempo=0;
+                        //pantalla fin
+
+
+                    }
+
+
                 }
 
-            };//k
+            };
 
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
-            RelojEnemigos.schedule(timerenemigos, 0, 2000);
+            RelojEnemigos.schedule(timerenemigos, 0, 1000);
 
             PonerTitulo();
 
