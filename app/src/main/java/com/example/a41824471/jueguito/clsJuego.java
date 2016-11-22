@@ -36,6 +36,8 @@ public class clsJuego {
     boolean tocando = false;
     Rect linear;
     MenuItemImage botonjugar;
+    MenuItemImage botonvolver;
+    boolean juganodo=true;
     int puntaje = 0;
     Label lblPuntaje;
     Context context;
@@ -92,7 +94,6 @@ public class clsJuego {
 
         }
         public void Comenzarjuego() {
-            Director.sharedDirector().runWithScene(EscenaJuego());
             cancion= new ArrayList<>();
             cancion.add("sol");
             cancion.add("re");
@@ -100,6 +101,10 @@ public class clsJuego {
             cancion.add("re");
             cancion.add("sol");
             cancion.add("re");
+            tiempo=0;
+            juganodo=true;
+            puntaje=0;
+            Director.sharedDirector().runWithScene(EscenaJuego());
         }
     }
 
@@ -122,8 +127,34 @@ public class clsJuego {
 
     class CapaFinalFrente extends Layer{
         public CapaFinalFrente(){
+            Label lblmsg;
+            lblmsg = Label.label("¡Canción Terminada!", "Verdana", 70);
+            lblmsg.setString("¡Canción Terminada!");
+            lblmsg.setPosition(PantallaDis.width / 2, PantallaDis.height/2);
 
+            Label lblShowP;
+            lblShowP = Label.label("Puntaje:" +puntaje, "Verdana", 70);
+            lblShowP.setString("Puntaje:" +puntaje);
+            lblShowP.setPosition(PantallaDis.width / 2, PantallaDis.height/2-lblmsg.getHeight());
+
+            botonvolver=MenuItemImage.item("flecha.png", "flecha.png",this,"Iramenu");
+            float posbotonx, posbotony;
+            posbotonx=PantallaDis.width / 2;
+            posbotony=PantallaDis.height/2 -botonvolver.getHeight();
+            botonvolver.setPosition(posbotonx,posbotony);
+
+            Menu botones= Menu.menu(botonvolver);
+            //botones.setPosition(PantallaDis.width/2- botones.getWidth()/2, PantallaDis.getHeight()-2- (botonjugar.getHeight()+90));
+            botones.setPosition(0, 0);
+
+            addChild(lblmsg);
+            addChild(lblShowP);
+            addChild(botones);
         }
+        public void Iramenu() {
+            Director.sharedDirector().runWithScene(EscenaMenu());
+        }
+
     }
 
       private Scene EscenaJuego() {
@@ -185,28 +216,28 @@ public class clsJuego {
             RelojColisiones.schedule(TColisiones, 0, 100);
 
 
-
-
-            TimerTask timerenemigos;
+            final TimerTask timerenemigos;
             timerenemigos = new TimerTask() {
                 @Override
                 public void run() {
-                    if(tiempo<=cancion.size()){
+                    if (tiempo <= cancion.size() - 1) {
                         snota = cancion.get(tiempo);
                         PonerNota(snota);
                         tiempo++;
 
-                    }else{
-                        tiempo=0;
-                        //pantalla fin
+                    } else {
+                        if(juganodo){
+                            juganodo = false;
+                            Director.sharedDirector().runWithScene(EscenaFinal());
+                            //pantalla fin
 
-
+                        }
                     }
-
-
                 }
 
+
             };
+
 
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
@@ -320,7 +351,7 @@ public class clsJuego {
                     Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
                     if (nota.getSprite().getPositionY() <= 0) {
                         if(!nota.isApretada()){
-                            puntaje--;
+                            //puntaje--;
                             PonerTitulo();
                         }
                         arraynotas.remove(nota);
@@ -340,17 +371,21 @@ public class clsJuego {
 
                     if (touchr.intersect(notar) && notar.intersect(linear)) {
                         hubocolision = true;
+                       if(nota.isApretada()) {
+                           Log.d("juego", "interaTOTAL");
+                           puntaje = puntaje + 5;
+                           if (arraynotas.get(i).getTipo().equals("Sol")) {
+                               Log.d("inter", "sol");
+                               mpSol = MediaPlayer.create(context, R.raw.sol);
+                               mpSol.start();
+                           }
+                           if (arraynotas.get(i).getTipo().equals("Re")) {
+                               mpRe = MediaPlayer.create(context, R.raw.re);
+                               Log.d("inter", "re");
+                               mpRe.start();
+                           }
+                       }
                         nota.setApretada(true);
-                        Log.d("juego", "interaTOTAL");
-                        puntaje = puntaje + 5;
-                        if (arraynotas.get(i).getTipo().equals("Sol")) {
-                            mpSol = MediaPlayer.create(context, R.raw.sol);
-                            mpSol.start();
-                        }
-                        if (arraynotas.get(i).getTipo().equals("Re")) {
-                            mpRe = MediaPlayer.create(context, R.raw.re);
-                            mpRe.start();
-                        }
                         PonerTitulo();
                     }
                 }
