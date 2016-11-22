@@ -198,7 +198,7 @@ public class clsJuego {
 
                 }
 
-            };
+            };//k
 
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
