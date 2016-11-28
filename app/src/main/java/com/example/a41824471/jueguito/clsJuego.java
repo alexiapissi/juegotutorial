@@ -20,6 +20,7 @@ import org.cocos2d.types.CCPoint;
 import org.cocos2d.types.CCSize;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,7 +30,10 @@ public class clsJuego {
     CCSize PantallaDis;
     Sprite ImagenFondo;
     Sprite linea;
-    Nota nota;
+    Nota SOL;
+    Nota RE;
+    Nota LA;
+    Nota MI;
     ArrayList<Nota> arraynotas;
     public static int tamañotouch = 50;
     Rect touchr;
@@ -42,8 +46,11 @@ public class clsJuego {
     Label lblPuntaje;
     Context context;
     public int tiempo=0;
-    ArrayList<String> cancion;
+    ArrayList<Nota> cancion;
+    ArrayList<Nota> listanotas;
     String snota;
+    Nota notax;
+    Sprite cuerda;
 
     public clsJuego(CCGLSurfaceView Vistadeljuego, Context context) {
         _VistaJuego = Vistadeljuego;
@@ -94,13 +101,47 @@ public class clsJuego {
 
         }
         public void Comenzarjuego() {
+            listanotas=new ArrayList<>();
+            SOL=new Nota("nota-sol.png");
+            SOL.setTipo("sol");
+            SOL.setSonido("sol");
+            SOL.setApretada(false);
+            listanotas.add(SOL);
+
+            RE=new Nota("nota-re.png");
+            RE.setTipo("re");
+            RE.setSonido("re");
+            RE.setApretada(false);
+            listanotas.add(RE);
+
+            LA=new Nota("nota-la.png");
+            LA.setTipo("la");
+            LA.setSonido("la");
+            LA.setApretada(false);
+            listanotas.add(LA);
+
+            MI=new Nota("nota-mi.png");
+            MI.setTipo("mi");
+            MI.setSonido("mi");
+            MI.setApretada(false);
+            listanotas.add(MI);
+
+            Random random;
             cancion= new ArrayList<>();
-            cancion.add("sol");
-            cancion.add("re");
-            cancion.add("sol");
-            cancion.add("re");
-            cancion.add("sol");
-            cancion.add("re");
+            random=new Random();
+            int num;
+            //for(int i=0; i<=5; i++) {
+            num=random.nextInt((4 - 0) + 1) + 0;
+            cancion.add(listanotas.get(num));
+            num=random.nextInt((4 - 0) + 1) + 0;
+            cancion.add(listanotas.get(num));
+            num=random.nextInt((4 - 0) + 1) + 0;
+            cancion.add(listanotas.get(num));
+            num=random.nextInt((4 - 0) + 1) + 0;
+            cancion.add(listanotas.get(num));
+            num=random.nextInt((4 - 0) + 1) + 0;
+            cancion.add(listanotas.get(num));
+            //}
             tiempo=0;
             juganodo=true;
             puntaje=0;
@@ -178,12 +219,33 @@ public class clsJuego {
     class CapaDeFondo extends Layer {
         public CapaDeFondo() {
             ponerImagenFondo();
+
+            float pos=PantallaDis.width / 5;
+            PonerCuerda(pos);
+            pos=PantallaDis.width/5+PantallaDis.width/5;
+            PonerCuerda(pos);
+            pos=PantallaDis.width/5+PantallaDis.width/5+PantallaDis.width/5;
+            PonerCuerda(pos);
+            pos=PantallaDis.width/5+PantallaDis.width/5+PantallaDis.width/5+PantallaDis.width/5;
+            PonerCuerda(pos);
+        }
+
+        void PonerCuerda(float posx) {
+            cuerda = Sprite.sprite("cuerda.png");
+            cuerda.runAction(ScaleBy.action(0.01f, 1.0f, 1.0f));
+
+            float posy;
+            float altocuerda = cuerda.getHeight();
+            posy = PantallaDis.height-(altocuerda/2);
+            cuerda.setPosition(posx, posy);
+            cuerda.runAction(ScaleBy.action(0.01f, 1.0f, 4.0f));
+            super.addChild(cuerda);
         }
 
         private void ponerImagenFondo() {
-            ImagenFondo = Sprite.sprite("fondojuego.gif");
+            ImagenFondo = Sprite.sprite("madera4.png");
             ImagenFondo.setPosition(PantallaDis.width / 2, PantallaDis.height / 2);
-            ImagenFondo.runAction(ScaleBy.action(0.01f, 3.0f, 4.0f));
+            ImagenFondo.runAction(ScaleBy.action(0.01f, 2.0f, 2.0f));
             super.addChild(ImagenFondo);
         }
     }
@@ -204,6 +266,7 @@ public class clsJuego {
             Log.d("linear:", "linea+" + linear);
             lblPuntaje = Label.label("" + puntaje, "Verdana", 30);
 
+
             TimerTask TColisiones;
             TColisiones = new TimerTask() {
                 @Override
@@ -221,8 +284,8 @@ public class clsJuego {
                 @Override
                 public void run() {
                     if (tiempo <= cancion.size() - 1) {
-                        snota = cancion.get(tiempo);
-                        PonerNota(snota);
+                        notax = cancion.get(tiempo);
+                        PonerNota(notax);
                         tiempo++;
 
                     } else {
@@ -252,6 +315,7 @@ public class clsJuego {
 
         void Initlinea() {
             linea = Sprite.sprite("lineaneon.gif");
+            linea.runAction(ScaleBy.action(0.01f, 1.5f, 1.5f));
 
 
             float posx, posy;
@@ -264,34 +328,26 @@ public class clsJuego {
             super.addChild(linea);
         }
 
-        void PonerNota(String snota){
-            if(snota.equals("sol")){
-                nota = new Nota("nota-sol.gif");
-                nota.setTipo("Sol");
-                nota.setSonido("sol");
-                nota.setApretada(false);
-            }
-            if(snota.equals("re")){
-                nota = new Nota("nota-re.png");
-                nota.setTipo("Re");
-                nota.setSonido("re");
-                nota.setApretada(false);
-            }
+        void PonerNota(Nota nota){
 
             CCPoint PosInicial;
             PosInicial = new CCPoint();
             float Altura = nota.getSprite().getHeight();
             float Ancho = nota.getSprite().getWidth();
 
-
-            if (nota.tipo.equals("Sol")){
-                PosInicial.y = PantallaDis.height + Altura / 2;
-                PosInicial.x = PantallaDis.width / 4;
+            if (nota.tipo.equals("sol")){
+                PosInicial.x = PantallaDis.width / 5;
             }
-            if(nota.tipo.equals("Re")){
-                PosInicial.y=PantallaDis.height+Altura/2;
-                PosInicial.x=PantallaDis.width/4+PantallaDis.width/4;
+            if(nota.tipo.equals("re")){
+                PosInicial.x=PantallaDis.width/5+PantallaDis.width/5;
             }
+            if (nota.tipo.equals("la")){
+                PosInicial.x = PantallaDis.width / 5+PantallaDis.width/5+PantallaDis.width/5;
+            }
+            if(nota.tipo.equals("mi")){
+                PosInicial.x=PantallaDis.width/5+PantallaDis.width/5+PantallaDis.width/5+PantallaDis.width/5;
+            }
+            PosInicial.y=PantallaDis.height+Altura/2;
 
             nota.getSprite().setPosition(PosInicial.x, PosInicial.y);
             //Enemigo.runAction(RotateTo.action(0.01f,180f));
@@ -313,6 +369,9 @@ public class clsJuego {
             super.addChild(lblPuntaje);
 
         }
+
+
+
 
         public boolean ccTouchesBegan(MotionEvent event) {
             int x = (int) event.getX();
