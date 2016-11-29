@@ -288,6 +288,7 @@ public class clsJuego {
                         PonerNota(notax);
                         tiempo++;
                         Log.d("timernotas","puse nota:"+notax.getTipo());
+                        Log.d("timernotas","tiempo:"+tiempo);
                     } else {
                         if(juganodo){
                             extratiempo++;
@@ -302,7 +303,6 @@ public class clsJuego {
 
 
             };
-
 
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
@@ -324,7 +324,7 @@ public class clsJuego {
 
 
             float posx, posy;
-            float Altolinea = linea.getHeight();
+            //float Altolinea = linea.getHeight();
             float Ancholinea = linea.getWidth();
             posy = PantallaDis.height / 8;
             posx = 0 + Ancholinea / 2;
@@ -338,7 +338,7 @@ public class clsJuego {
             CCPoint PosInicial;
             PosInicial = new CCPoint();
             float Altura = nota.getSprite().getHeight();
-            float Ancho = nota.getSprite().getWidth();
+            //float Ancho = nota.getSprite().getWidth();
 
             if (nota.tipo.equals("sol")){
                 PosInicial.x = PantallaDis.width / 5;
@@ -399,7 +399,7 @@ public class clsJuego {
             boolean hubocolision;
             hubocolision = false;
             Nota nota;
-            if (tocando == true) {
+            if (tocando) {
                 if (!touchr.intersect(linear)) {
                     Log.d("detectar colis fuera", "linea" + linear);
                     return;
@@ -417,7 +417,7 @@ public class clsJuego {
                     Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
                     if (nota.getSprite().getPositionY() <= 0) {
                         if(!nota.isApretada()){
-                            //puntaje--;
+                            puntaje--;
                             PonerTitulo();
                         }
                         arraynotas.remove(nota);
