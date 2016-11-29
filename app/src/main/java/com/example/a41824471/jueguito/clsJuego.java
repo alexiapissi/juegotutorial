@@ -30,10 +30,6 @@ public class clsJuego {
     CCSize PantallaDis;
     Sprite ImagenFondo;
     Sprite linea;
-    Nota SOL;
-    Nota RE;
-    Nota LA;
-    Nota MI;
     ArrayList<Nota> arraynotas;
     public static int tamañotouch = 50;
     Rect touchr;
@@ -47,8 +43,6 @@ public class clsJuego {
     Context context;
     public int tiempo=0;
     ArrayList<Nota> cancion;
-    ArrayList<Nota> listanotas;
-    String snota;
     Nota notax;
     Sprite cuerda;
 
@@ -138,7 +132,8 @@ public class clsJuego {
             random=new Random();
             int num;
             for(int i=1; i<=10; i++) {
-            num=random.nextInt((3 - 0) + 1) + 0;
+            //num=random.nextInt((3 - 0) + 1) + 0;
+                num=random.nextInt(3);
             cancion.add(getNota(num));
             /*//cancion.add(listanotas.get(num));
             num=random.nextInt((3 - 0) + 1) + 0;
