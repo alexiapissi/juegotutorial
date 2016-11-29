@@ -132,8 +132,7 @@ public class clsJuego {
             random=new Random();
             int num;
             for(int i=1; i<=10; i++) {
-            //num=random.nextInt((3 - 0) + 1) + 0;
-                num=random.nextInt(3);
+            num=random.nextInt(3 - 0) + 1;
             cancion.add(getNota(num));
             /*//cancion.add(listanotas.get(num));
             num=random.nextInt((3 - 0) + 1) + 0;
