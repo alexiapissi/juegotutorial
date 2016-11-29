@@ -39,6 +39,8 @@ public class clsJuego {
     MenuItemImage botonvolver;
     boolean juganodo=true;
     int puntaje = 0;
+    int extratiempo=0;
+    MediaPlayer mpAplauso;
     Label lblPuntaje;
     Context context;
     public int tiempo=0;
@@ -75,6 +77,8 @@ public class clsJuego {
     }
     class CapaMenuFrente extends Layer{
         public CapaMenuFrente(){
+            tiempo=0;
+            extratiempo=0;
             Label lblTitulo;
             lblTitulo = Label.label("ViolinGame", "Verdana", 100);
             lblTitulo.setString("Violin Game");
@@ -131,20 +135,12 @@ public class clsJuego {
             cancion= new ArrayList<>();
             random=new Random();
             int num;
-            for(int i=1; i<=10; i++) {
-            num=random.nextInt(3 - 0) + 1;
+            for(int i=1; i<=5; i++) {
+            num=random.nextInt(4);
             cancion.add(getNota(num));
-            /*//cancion.add(listanotas.get(num));
-            num=random.nextInt((3 - 0) + 1) + 0;
-            cancion.add(getNota(num));
-            num=random.nextInt((3 - 0) + 1) + 0;
-            cancion.add(getNota(num));
-            num=random.nextInt((3 - 0) + 1) + 0;
-            cancion.add(getNota(num));
-            num=random.nextInt((3 - 0) + 1) + 0;
-            cancion.add(getNota(num));*/
             }
             tiempo=0;
+            extratiempo=0;
             juganodo=true;
             puntaje=0;
             Director.sharedDirector().runWithScene(EscenaJuego());
@@ -170,6 +166,8 @@ public class clsJuego {
 
     class CapaFinalFrente extends Layer{
         public CapaFinalFrente(){
+            mpAplauso = MediaPlayer.create(context, R.raw.aplausos);
+            mpAplauso.start();
             Label lblmsg;
             lblmsg = Label.label("¡Canción Terminada!", "Verdana", 70);
             lblmsg.setString("¡Canción Terminada!");
@@ -290,14 +288,14 @@ public class clsJuego {
                         PonerNota(notax);
                         tiempo++;
                         Log.d("timernotas","puse nota:"+notax.getTipo());
-
-
                     } else {
                         if(juganodo){
-                            juganodo = false;
-                            Director.sharedDirector().runWithScene(EscenaFinal());
-                            //pantalla fin
-
+                            extratiempo++;
+                            Log.d("tiempo","extra"+extratiempo);
+                            if(extratiempo>=5){
+                                juganodo=false;
+                                Director.sharedDirector().runWithScene(EscenaFinal());
+                            }
                         }
                     }
                 }
@@ -318,6 +316,7 @@ public class clsJuego {
         MediaPlayer mpRe;
         MediaPlayer mpLa;
         MediaPlayer mpMi;
+
 
         void Initlinea() {
             linea = Sprite.sprite("lineaneon.gif");
@@ -401,12 +400,13 @@ public class clsJuego {
             hubocolision = false;
             Nota nota;
             if (tocando == true) {
+                if (!touchr.intersect(linear)) {
+                    Log.d("detectar colis fuera", "linea" + linear);
+                    return;
+                }
                 Log.d("detectar colis tocando", "touch" + touchr);
                 Log.d("detectar colis tocando", "linea" + linear);
-                /*if (touchr.intersect(linear)) {
-                    hubocolision = true;
-                    Log.d("juego", "interaC");
-                }*/
+
 
                 for (int i = 0; i < arraynotas.size(); i++) {
                     nota = arraynotas.get(i);
@@ -421,21 +421,26 @@ public class clsJuego {
                             PonerTitulo();
                         }
                         arraynotas.remove(nota);
+                        Log.d("detectar colis tocando", "remuevo nota" + nota.getTipo());
                     }
                     Log.d("inter" + i, "nota" + notar);
                     Log.d("inter" + i, "touch" + touchr);
                     Log.d("inter", "touch" + linear);
 
+                    /*
                     if (touchr.intersect(notar)) {
                         Log.d("juego", "interaA");
+                        Log.d("detectar colis tocando", "intersecta touch + nota" + nota.getTipo());
                         hubocolision = true;
                     }
+
                     if (notar.intersect(linear)) {
                         Log.d("juego", "interaB");
                         hubocolision = true;
                     }
-
-                    if (touchr.intersect(notar) && notar.intersect(linear)) {
+*/
+                    // touchr.intersect(notar) &&
+                    if ( notar.intersect(linear)) {
                         hubocolision = true;
                        if(nota.isApretada()) {
                            Log.d("juego", "interaTOTAL");
