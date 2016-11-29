@@ -464,7 +464,7 @@ public class clsJuego {
                                mpMi = MediaPlayer.create(context, R.raw.mi);
                                Log.d("inter", "re");
                                mpMi.start();
-                           }
+                           }//k
                        }
                         nota.setApretada(true);
                         PonerTitulo();
