@@ -399,6 +399,21 @@ public class clsJuego {
             boolean hubocolision;
             hubocolision = false;
             Nota nota;
+            for (int i = 0; i < arraynotas.size(); i++) {
+                nota = arraynotas.get(i);
+                int notax = (int) nota.getSprite().getWidth() * 2;
+                int notay = (int) nota.getSprite().getHeight() * 2;
+                int solX = (int) nota.getSprite().getPositionX();
+                int solY = (int) nota.getSprite().getPositionY();
+                Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
+                if (nota.getSprite().getPositionY() < 0) {
+                    if(!nota.isApretada()){
+                        puntaje--;
+                        PonerTitulo();
+                    }
+                    arraynotas.remove(nota);
+                    Log.d("detectar colis tocando", "remuevo nota" + nota.getTipo());
+                }
             if (tocando == true) {
                 if (!touchr.intersect(linear)) {
                     Log.d("detectar colis fuera", "linea" + linear);
@@ -408,24 +423,7 @@ public class clsJuego {
                 Log.d("detectar colis tocando", "linea" + linear);
 
 
-                for (int i = 0; i < arraynotas.size(); i++) {
-                    nota = arraynotas.get(i);
-                    int notax = (int) nota.getSprite().getWidth() * 2;
-                    int notay = (int) nota.getSprite().getHeight() * 2;
-                    int solX = (int) nota.getSprite().getPositionX();
-                    int solY = (int) nota.getSprite().getPositionY();
-                    Rect notar = new Rect(solX - notax, Math.round(PantallaDis.getHeight() - solY - notay), solX + notax, Math.round(PantallaDis.getHeight() - solY + notay));
-                    if (nota.getSprite().getPositionY() <= 0) {
-                        if(!nota.isApretada()){
-                            //puntaje--;
-                            PonerTitulo();
-                        }
-                        arraynotas.remove(nota);
-                        Log.d("detectar colis tocando", "remuevo nota" + nota.getTipo());
-                    }
-                    Log.d("inter" + i, "nota" + notar);
-                    Log.d("inter" + i, "touch" + touchr);
-                    Log.d("inter", "touch" + linear);
+
 
                     /*
                     if (touchr.intersect(notar)) {
@@ -442,7 +440,7 @@ public class clsJuego {
                     // touchr.intersect(notar) &&
                     if ( notar.intersect(linear)) {
                         hubocolision = true;
-                       if(nota.isApretada()) {
+                       if(!nota.isApretada()) {
                            Log.d("juego", "interaTOTAL");
                            puntaje = puntaje + 5;
                            if (arraynotas.get(i).getTipo().equals("sol")) {
