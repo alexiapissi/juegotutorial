@@ -29,7 +29,7 @@ public class Nota{
     public String getSonido() {
         return sonido;
     }
-
+//d
     public boolean isApretada() {
         return apretada;
     }
