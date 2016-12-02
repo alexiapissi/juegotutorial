@@ -1,5 +1,8 @@
 package com.example.a41824471.jueguito;
 
+import android.media.MediaPlayer;
+import android.provider.MediaStore;
+
 import org.cocos2d.nodes.Sprite;
 import org.cocos2d.opengl.Texture2D;
 
@@ -7,7 +10,7 @@ import org.cocos2d.opengl.Texture2D;
 public class Nota{
     String tipo;
     Sprite sprite;
-    String sonido;
+    MediaPlayer sonido;
     boolean apretada;
 
     public Nota( String gifFile) {
@@ -26,10 +29,7 @@ public class Nota{
         return sprite;
     }
 
-    public String getSonido() {
-        return sonido;
-    }
-//d
+
     public boolean isApretada() {
         return apretada;
     }
@@ -38,11 +38,15 @@ public class Nota{
         this.sprite = sprite;
     }
 
-    public void setSonido(String sonido) {
-        this.sonido = sonido;
-    }
-
     public void setApretada(boolean apretada) {
         this.apretada = apretada;
+    }
+
+    public MediaPlayer getSonido() {
+        return sonido;
+    }
+
+    public void setSonido(MediaPlayer sonido) {
+        this.sonido = sonido;
     }
 }

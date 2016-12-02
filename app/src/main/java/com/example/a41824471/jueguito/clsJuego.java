@@ -45,8 +45,13 @@ public class clsJuego {
     Context context;
     public int tiempo=0;
     ArrayList<Nota> cancion;
+    ArrayList<Nota> cancionEstrellita;
     Nota notax;
     Sprite cuerda;
+    MediaPlayer mpSol;
+    MediaPlayer mpRe;
+    MediaPlayer mpLa;
+    MediaPlayer mpMi;
 
     public clsJuego(CCGLSurfaceView Vistadeljuego, Context context) {
         _VistaJuego = Vistadeljuego;
@@ -106,25 +111,29 @@ public class clsJuego {
                 case 0:
                     nota = new Nota("nota-sol.png");
                     nota.setTipo("sol");
-                    nota.setSonido("sol");
+                    mpSol = MediaPlayer.create(context, R.raw.sol);
+                    nota.setSonido(mpSol);
                     nota.setApretada(false);
                     break;
                 case 1:
                     nota = new Nota("nota-re.png");
                     nota.setTipo("re");
-                    nota.setSonido("re");
+                    mpRe = MediaPlayer.create(context, R.raw.re);
+                    nota.setSonido(mpRe);
                     nota.setApretada(false);
                     break;
                 case 2:
                     nota = new Nota("nota-la.png");
                     nota.setTipo("la");
-                    nota.setSonido("la");
+                    mpLa = MediaPlayer.create(context, R.raw.la);
+                    nota.setSonido(mpLa);
                     nota.setApretada(false);
                     break;
                 case 3:
                     nota = new Nota("nota-mi.png");
                     nota.setTipo("mi");
-                    nota.setSonido("mi");
+                    mpMi = MediaPlayer.create(context, R.raw.mi);
+                    nota.setSonido(mpMi);
                     nota.setApretada(false);
                     break;
             }
@@ -135,7 +144,7 @@ public class clsJuego {
             cancion= new ArrayList<>();
             random=new Random();
             int num;
-            for(int i=1; i<=5; i++) {
+            for(int i=1; i<=20; i++) {
             num=random.nextInt(4);
             cancion.add(getNota(num));
             }
@@ -143,6 +152,9 @@ public class clsJuego {
             extratiempo=0;
             juganodo=true;
             puntaje=0;
+
+            cancionEstrellita=new ArrayList<>();
+
             Director.sharedDirector().runWithScene(EscenaJuego());
         }
     }
@@ -312,10 +324,7 @@ public class clsJuego {
 
         }
 
-        MediaPlayer mpSol;
-        MediaPlayer mpRe;
-        MediaPlayer mpLa;
-        MediaPlayer mpMi;
+
 
 
         void Initlinea() {
@@ -324,7 +333,6 @@ public class clsJuego {
 
 
             float posx, posy;
-            float Altolinea = linea.getHeight();
             float Ancholinea = linea.getWidth();
             posy = PantallaDis.height / 8;
             posx = 0 + Ancholinea / 2;
@@ -338,18 +346,17 @@ public class clsJuego {
             CCPoint PosInicial;
             PosInicial = new CCPoint();
             float Altura = nota.getSprite().getHeight();
-            float Ancho = nota.getSprite().getWidth();
 
-            if (nota.tipo.equals("sol")){
+            if (nota.getTipo().equals("sol")){
                 PosInicial.x = PantallaDis.width / 5;
             }
-            if(nota.tipo.equals("re")){
+            if(nota.getTipo().equals("re")){
                 PosInicial.x=PantallaDis.width*2/5;
             }
-            if (nota.tipo.equals("la")){
+            if (nota.getTipo().equals("la")){
                 PosInicial.x=PantallaDis.width*3/5;
             }
-            if(nota.tipo.equals("mi")){
+            if(nota.getTipo().equals("mi")){
                 PosInicial.x=PantallaDis.width*4/5;
             }
             PosInicial.y=PantallaDis.height+Altura/2;
@@ -396,8 +403,6 @@ public class clsJuego {
         }
 
         void DetectarColisiones() {
-            boolean hubocolision;
-            hubocolision = false;
             Nota nota;
             for (int i = 0; i < arraynotas.size(); i++) {
                 nota = arraynotas.get(i);
@@ -414,12 +419,11 @@ public class clsJuego {
                     arraynotas.remove(nota);
                     Log.d("detectar colis tocando", "remuevo nota" + nota.getTipo());
                 }
-            if (tocando == true) {
+            if (tocando) {
                 if (!touchr.intersect(linear)) {
                     Log.d("detectar colis fuera", "linea" + linear);
                     return;
                 }
-                Log.d("detectar colis tocando", "touch" + touchr);
                 Log.d("detectar colis tocando", "linea" + linear);
 
 
@@ -439,30 +443,10 @@ public class clsJuego {
 */
                     // touchr.intersect(notar) &&
                     if ( notar.intersect(linear)) {
-                        hubocolision = true;
                        if(!nota.isApretada()) {
                            Log.d("juego", "interaTOTAL");
                            puntaje = puntaje + 5;
-                           if (arraynotas.get(i).getTipo().equals("sol")) {
-                               Log.d("inter", "sol");
-                               mpSol = MediaPlayer.create(context, R.raw.sol);
-                               mpSol.start();
-                           }
-                           if (arraynotas.get(i).getTipo().equals("re")) {
-                               mpRe = MediaPlayer.create(context, R.raw.re);
-                               Log.d("inter", "re");
-                               mpRe.start();
-                           }
-                           if (arraynotas.get(i).getTipo().equals("la")) {
-                               mpLa = MediaPlayer.create(context, R.raw.la);
-                               Log.d("inter", "la");
-                               mpLa.start();
-                           }
-                           if (arraynotas.get(i).getTipo().equals("mi")) {
-                               mpMi = MediaPlayer.create(context, R.raw.mi);
-                               Log.d("inter", "re");
-                               mpMi.start();
-                           }
+                          nota.getSonido().start();
                        }
                         nota.setApretada(true);
                         PonerTitulo();
