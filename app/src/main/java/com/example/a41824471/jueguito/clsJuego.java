@@ -424,24 +424,6 @@ public class clsJuego {
                     Log.d("detectar colis fuera", "linea" + linear);
                     return;
                 }
-                Log.d("detectar colis tocando", "linea" + linear);
-
-
-
-
-                    /*
-                    if (touchr.intersect(notar)) {
-                        Log.d("juego", "interaA");
-                        Log.d("detectar colis tocando", "intersecta touch + nota" + nota.getTipo());
-                        hubocolision = true;
-                    }
-
-                    if (notar.intersect(linear)) {
-                        Log.d("juego", "interaB");
-                        hubocolision = true;
-                    }
-*/
-                    // touchr.intersect(notar) &&
                     if ( notar.intersect(linear)) {
                        if(!nota.isApretada()) {
                            Log.d("juego", "interaTOTAL");
